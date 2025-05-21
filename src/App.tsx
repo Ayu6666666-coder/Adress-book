@@ -1,0 +1,240 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+
+interface Contact {
+  id: string;
+  部门: string;
+  姓名: string;
+  手机?: string;
+  分机?: string;
+  直线?: string;
+}
+
+interface ContactsData {
+  contacts: Contact[];
+  departments: string[];
+  total: number;
+  fields: string[];
+}
+
+function App() {
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('所有部门');
+  const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/contacts.json')
+      .then(response => response.json())
+      .then((data: ContactsData) => {
+        setContacts(data.contacts);
+        setDepartments(data.departments);
+        
+        // 初始化所有部门为展开状态
+        const expanded: Record<string, boolean> = {};
+        data.departments.forEach(dept => {
+          expanded[dept] = true;
+        });
+        setExpandedDepartments(expanded);
+        
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('加载通讯录数据失败:', error);
+        setIsLoading(false);
+      });
+  }, []);
+
+  // 过滤联系人
+  const filteredContacts = contacts.filter(contact => {
+    const matchesSearch = 
+      searchTerm === '' || 
+      (contact.姓名 && contact.姓名.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (contact.部门 && contact.部门.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (contact.手机 && contact.手机.includes(searchTerm)) ||
+      (contact.直线 && contact.直线.includes(searchTerm)) ||
+      (contact.分机 && contact.分机.includes(searchTerm));
+    
+    const matchesDepartment = 
+      selectedDepartment === '所有部门' || 
+      contact.部门 === selectedDepartment;
+    
+    return matchesSearch && matchesDepartment;
+  });
+
+  // 按部门分组联系人
+  const groupedContacts: Record<string, Contact[]> = {};
+  
+  filteredContacts.forEach(contact => {
+    const dept = contact.部门 || '未分类';
+    if (!groupedContacts[dept]) {
+      groupedContacts[dept] = [];
+    }
+    groupedContacts[dept].push(contact);
+  });
+
+  // 切换部门展开/折叠状态
+  const toggleDepartment = (dept: string) => {
+    setExpandedDepartments(prev => ({
+      ...prev,
+      [dept]: !prev[dept]
+    }));
+  };
+
+  // 显示联系人详情
+  const showContactDetails = (contact: Contact) => {
+    setSelectedContact(contact);
+  };
+
+  // 关闭联系人详情
+  const closeContactDetails = () => {
+    setSelectedContact(null);
+  };
+
+  // 计算每个部门的联系人数量
+  const getDepartmentCount = (dept: string) => {
+    return groupedContacts[dept]?.length || 0;
+  };
+  
+  return (
+    <div className="app">
+      <header className="header">
+        <h1 className="company-name">上海新金桥能源科技有限公司</h1>
+        <h2 className="app-title">通讯录</h2>
+      </header>
+
+      <div className="search-container">
+        <div className="search-box">
+          <input
+            type="text"
+            placeholder="搜索姓名、部门、电话..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          {searchTerm && (
+            <button 
+              className="clear-search" 
+              onClick={() => setSearchTerm('')}
+            >
+              ×
+            </button>
+          )}
+          <span className="search-icon">🔍</span>
+        </div>
+        
+        <select
+          value={selectedDepartment}
+          onChange={(e) => setSelectedDepartment(e.target.value)}
+          className="department-select"
+        >
+          <option value="所有部门">所有部门</option>
+          {departments.map((dept) => (
+            <option key={dept} value={dept}>{dept}</option>
+          ))}
+        </select>
+      </div>
+
+      {isLoading ? (
+        <div className="loading">加载中...</div>
+      ) : (
+        <div className="contacts-container">
+          {Object.keys(groupedContacts).length === 0 ? (
+            <div className="no-results">未找到匹配的联系人</div>
+          ) : (
+            departments.map(dept => (
+              groupedContacts[dept] && (
+                <div key={dept} className="department-section">
+                  <div 
+                    className="department-header" 
+                    onClick={() => toggleDepartment(dept)}
+                  >
+                    <h3>{dept}</h3>
+                    <div className="department-header-right">
+                      <span className="contact-count">{getDepartmentCount(dept)}人</span>
+                      <span className={`expand-icon ${expandedDepartments[dept] ? 'expanded' : ''}`}>▼</span>
+                    </div>
+                  </div>
+                  
+                  {expandedDepartments[dept] && (
+                    <div className="contact-list">
+                      {groupedContacts[dept].map(contact => (
+                        <div 
+                          key={contact.id} 
+                          className="contact-item"
+                          onClick={() => showContactDetails(contact)}
+                        >
+                          <div className="contact-name">{contact.姓名}</div>
+                          {contact.手机 && (
+                            <a 
+                              href={`tel:${contact.手机}`} 
+                              className="contact-phone" 
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {contact.手机}
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            ))
+          )}
+        </div>
+      )}
+
+      {selectedContact && (
+        <div className="contact-details-overlay" onClick={closeContactDetails}>
+          <div className="contact-details" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={closeContactDetails}>×</button>
+            <h3 className="detail-name">{selectedContact.姓名}</h3>
+            <p className="detail-department">{selectedContact.部门}</p>
+            
+            <div className="contact-info">
+              {selectedContact.手机 && (
+                <a href={`tel:${selectedContact.手机}`} className="contact-action">
+                  <div className="action-icon">📱</div>
+                  <div className="action-label">手机</div>
+                  <div className="action-value">{selectedContact.手机}</div>
+                </a>
+              )}
+              
+              {selectedContact.直线 && (
+                <a href={`tel:${selectedContact.直线}`} className="contact-action">
+                  <div className="action-icon">☎️</div>
+                  <div className="action-label">直线</div>
+                  <div className="action-value">{selectedContact.直线}</div>
+                </a>
+              )}
+              
+              {selectedContact.分机 && (
+                <div className="contact-action">
+                  <div className="action-icon">📞</div>
+                  <div className="action-label">分机</div>
+                  <div className="action-value">{selectedContact.分机}</div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div 
+        className="made-by-jin" 
+        onClick={() => window.open('https://github.com/yourusername', '_blank')}
+      >
+        Made By Jin
+      </div>
+
+      {/* 新增底部静态备注 */}
+      <footer className="footer-remark">Made By Jin</footer>
+    </div>
+  );
+}
+
+export default App;

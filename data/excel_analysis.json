@@ -1,0 +1,80 @@
+{
+  "办公通讯录": {
+    "rows": 45,
+    "columns": 10,
+    "column_names": [
+      "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）",
+      "Unnamed: 1",
+      "Unnamed: 2",
+      "Unnamed: 3",
+      "Unnamed: 4",
+      "Unnamed: 5",
+      "Unnamed: 6",
+      "Unnamed: 7",
+      "Unnamed: 8",
+      "Unnamed: 9"
+    ],
+    "sample_data": [
+      {
+        "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）": "部门",
+        "Unnamed: 1": "姓名",
+        "Unnamed: 2": "直线",
+        "Unnamed: 3": "分机",
+        "Unnamed: 4": "手机",
+        "Unnamed: 5": "部门",
+        "Unnamed: 6": "姓名",
+        "Unnamed: 7": "直线",
+        "Unnamed: 8": "分机",
+        "Unnamed: 9": "手机"
+      },
+      {
+        "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）": "总经理室",
+        "Unnamed: 1": "顾震海",
+        "Unnamed: 2": 58992648,
+        "Unnamed: 3": 2648,
+        "Unnamed: 4": 13701703229,
+        "Unnamed: 5": "生产事业部",
+        "Unnamed: 6": "陆啸威",
+        "Unnamed: 7": 20421049,
+        "Unnamed: 8": 1049,
+        "Unnamed: 9": 15021319071
+      },
+      {
+        "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）": NaN,
+        "Unnamed: 1": "李勇翱",
+        "Unnamed: 2": 50323931,
+        "Unnamed: 3": 3931,
+        "Unnamed: 4": 18621900088,
+        "Unnamed: 5": NaN,
+        "Unnamed: 6": "王卫民",
+        "Unnamed: 7": 50323905,
+        "Unnamed: 8": 3905,
+        "Unnamed: 9": 13386010679
+      },
+      {
+        "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）": NaN,
+        "Unnamed: 1": "文卫",
+        "Unnamed: 2": 50323932,
+        "Unnamed: 3": 3932,
+        "Unnamed: 4": 18616331196,
+        "Unnamed: 5": NaN,
+        "Unnamed: 6": "黄斌",
+        "Unnamed: 7": NaN,
+        "Unnamed: 8": NaN,
+        "Unnamed: 9": 13818731105
+      },
+      {
+        "上海新金桥能源科技有限公司办公通讯录（2025年5月21日更新）": NaN,
+        "Unnamed: 1": "曹洪",
+        "Unnamed: 2": 50323935,
+        "Unnamed: 3": 3935,
+        "Unnamed: 4": 13817566030,
+        "Unnamed: 5": NaN,
+        "Unnamed: 6": "范培华",
+        "Unnamed: 7": 50323287,
+        "Unnamed: 8": 3287,
+        "Unnamed: 9": 13901731329
+      }
+    ]
+  }
+}
