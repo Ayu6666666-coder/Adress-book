@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # 或者你的主分支名，比如 master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 允许 workflow 写入仓库内容 (创建 gh-pages 分支)
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # 或者你项目兼容的 Node.js 版本
+
+      - name: Install dependencies
+        run: npm ci # 使用 npm ci 更快更可靠
+
+      - name: Build project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+          # cname: your-custom-domain.com # 如果你有自定义域名，取消注释并填写 
