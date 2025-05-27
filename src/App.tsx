@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// 新增部门接口定义
+interface Department {
+  id: string;
+  name: string;
+  description?: string;
+}
+
 interface Contact {
   id: string;
   部门: string;
+  部门ID: string; // 新增部门ID字段
   姓名: string;
   手机?: string;
   分机?: string;
@@ -13,6 +21,7 @@ interface Contact {
 interface ContactsData {
   contacts: Contact[];
   departments: string[];
+  departmentList: Department[]; // 新增部门列表
   total: number;
   fields: string[];
 }
@@ -20,12 +29,40 @@ interface ContactsData {
 function App() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
+  const [departmentList, setDepartmentList] = useState<Department[]>([]); // 新增部门列表状态
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('所有部门');
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 根据部门名称生成部门ID的辅助函数
+  const generateDepartmentId = (departmentName: string): string => {
+    // 使用部门名称的拼音首字母和时间戳生成唯一ID
+    const timestamp = Date.now().toString(36);
+    const nameHash = departmentName.split('').reduce((hash, char) => {
+      return hash + char.charCodeAt(0);
+    }, 0).toString(36);
+    return `dept_${nameHash}_${timestamp}`;
+  };
+
+  // 从联系人数据生成部门列表的辅助函数
+  const generateDepartmentList = (contacts: Contact[]): Department[] => {
+    const departmentMap = new Map<string, Department>();
+    
+    contacts.forEach(contact => {
+      if (contact.部门 && !departmentMap.has(contact.部门)) {
+        departmentMap.set(contact.部门, {
+          id: contact.部门ID || generateDepartmentId(contact.部门),
+          name: contact.部门,
+          description: `${contact.部门}部门`
+        });
+      }
+    });
+    
+    return Array.from(departmentMap.values());
+  };
 
   useEffect(() => {
     // 修复数据获取路径，确保在不同环境下都能正确加载
@@ -49,8 +86,27 @@ function App() {
           throw new Error('数据格式错误：contacts字段不存在或不是数组');
         }
         
-        setContacts(data.contacts);
+        // 处理联系人数据，确保每个联系人都有部门ID
+        const processedContacts = data.contacts.map(contact => {
+          if (!contact.部门ID) {
+            // 如果没有部门ID，根据部门名称生成一个
+            const deptId = generateDepartmentId(contact.部门);
+            return { ...contact, 部门ID: deptId };
+          }
+          return contact;
+        });
+        
+        setContacts(processedContacts);
         setDepartments(data.departments || []);
+        
+        // 处理部门列表数据
+        if (data.departmentList && Array.isArray(data.departmentList)) {
+          setDepartmentList(data.departmentList);
+        } else {
+          // 如果没有部门列表，从联系人数据中生成
+          const generatedDepartments = generateDepartmentList(processedContacts);
+          setDepartmentList(generatedDepartments);
+        }
         
         // 初始化所有部门为展开状态
         const expanded: Record<string, boolean> = {};
@@ -245,6 +301,7 @@ function App() {
             <button className="close-button" onClick={closeContactDetails}>×</button>
             <h3 className="detail-name">{selectedContact.姓名}</h3>
             <p className="detail-department">{selectedContact.部门}</p>
+            <p className="detail-department-id">部门ID: {selectedContact.部门ID}</p>
             
             <div className="contact-info">
               {selectedContact.手机 && (
