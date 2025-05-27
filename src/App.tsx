@@ -301,7 +301,6 @@ function App() {
             <button className="close-button" onClick={closeContactDetails}>×</button>
             <h3 className="detail-name">{selectedContact.姓名}</h3>
             <p className="detail-department">{selectedContact.部门}</p>
-            <p className="detail-department-id">部门ID: {selectedContact.部门ID}</p>
             
             <div className="contact-info">
               {selectedContact.手机 && (

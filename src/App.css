@@ -377,20 +377,9 @@ body {
 }
 
 .detail-department {
-  margin: 0 0 10px;
+  margin: 0 0 20px;
   font-size: 16px;
   color: var(--light-text);
-}
-
-.detail-department-id {
-  margin: 0 0 20px;
-  font-size: 14px;
-  color: var(--light-text);
-  font-family: 'Courier New', monospace;
-  background-color: var(--background-color);
-  padding: 5px 10px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
 }
 
 .contact-info {
