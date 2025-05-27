@@ -66,6 +66,68 @@ body {
   z-index: 10;
 }
 
+/* 搜索容器样式 */
+.search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 20px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow);
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+  min-width: 250px;
+}
+
+.clear-search {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--light-text);
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.clear-search:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.department-select {
+  min-width: 150px;
+  padding: 12px 15px;
+  border: 2px solid var(--border-color);
+  border-radius: 25px;
+  font-size: 16px;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.department-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
 .search-input-container {
   flex: 1;
   position: relative;
@@ -76,16 +138,18 @@ body {
 
 .search-input {
   width: 100%;
-  padding: 10px 15px;
+  padding: 12px 45px 12px 15px;
   border: 2px solid var(--border-color);
-  border-radius: 30px;
+  border-radius: 25px;
   font-size: 16px;
   outline: none;
   transition: var(--transition);
+  box-sizing: border-box;
 }
 
 .search-input:focus {
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
 }
 
 .search-icon {
@@ -322,6 +386,41 @@ body {
   margin-top: 15px;
 }
 
+.contact-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  text-decoration: none;
+  color: var(--text-color);
+  transition: var(--transition);
+}
+
+.contact-action:hover {
+  background-color: var(--background-color);
+  border-radius: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.contact-action:last-child {
+  border-bottom: none;
+}
+
+.action-label {
+  font-weight: 500;
+  color: var(--light-text);
+  min-width: 60px;
+}
+
+.action-value {
+  flex: 1;
+  text-align: right;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
 .info-item {
   display: flex;
   align-items: center;
@@ -359,11 +458,33 @@ body {
 }
 
 /* 加载和无结果样式 */
-.loading, .no-results {
+.loading, .no-results, .error-message {
   text-align: center;
-  padding: 30px;
+  padding: 40px 20px;
   color: var(--light-text);
-  font-size: 18px;
+  font-size: 16px;
+}
+
+.error-message {
+  color: var(--accent-color);
+  background-color: #fef7f7;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+/* 数据统计样式 */
+.data-stats {
+  padding: 10px 15px;
+  background-color: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--light-text);
+  text-align: center;
+}
+
+.data-stats span {
+  margin-right: 10px;
 }
 
 /* 响应式调整 */
@@ -376,6 +497,20 @@ body {
   
   .contacts-list.card {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  
+  .search-container {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+  
+  .search-box {
+    min-width: auto;
+  }
+  
+  .department-select {
+    min-width: auto;
   }
 }
 

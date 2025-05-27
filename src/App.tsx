@@ -25,25 +25,46 @@ function App() {
   const [expandedDepartments, setExpandedDepartments] = useState<Record<string, boolean>>({});
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/contacts.json')
-      .then(response => response.json())
+    // 修复数据获取路径，确保在不同环境下都能正确加载
+    // 获取当前应用的基础路径
+    const basePath = process.env.PUBLIC_URL || '';
+    const dataPath = `${basePath}/contacts.json`;
+    
+    console.log('正在加载通讯录数据，路径:', dataPath);
+    
+    fetch(dataPath)
+      .then(response => {
+        console.log('响应状态:', response.status, response.statusText);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data: ContactsData) => {
+        console.log('成功加载通讯录数据:', data);
+        if (!data.contacts || !Array.isArray(data.contacts)) {
+          throw new Error('数据格式错误：contacts字段不存在或不是数组');
+        }
+        
         setContacts(data.contacts);
-        setDepartments(data.departments);
+        setDepartments(data.departments || []);
         
         // 初始化所有部门为展开状态
         const expanded: Record<string, boolean> = {};
-        data.departments.forEach(dept => {
+        (data.departments || []).forEach(dept => {
           expanded[dept] = true;
         });
         setExpandedDepartments(expanded);
         
+        setError(null);
         setIsLoading(false);
       })
       .catch(error => {
         console.error('加载通讯录数据失败:', error);
+        setError(`加载数据失败: ${error.message}`);
         setIsLoading(false);
       });
   }, []);
@@ -139,11 +160,41 @@ function App() {
       </div>
 
       {isLoading ? (
-        <div className="loading">加载中...</div>
+        <div className="loading">
+          <div>正在加载通讯录数据...</div>
+          <div style={{fontSize: '14px', marginTop: '10px', opacity: 0.7}}>
+            请稍候，正在从服务器获取最新数据
+          </div>
+        </div>
+      ) : error ? (
+        <div className="error-message">
+          <div>❌ {error}</div>
+          <div style={{fontSize: '14px', marginTop: '10px'}}>
+            请检查网络连接或联系管理员
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{marginTop: '15px', padding: '8px 16px', borderRadius: '4px', border: 'none', backgroundColor: '#4285f4', color: 'white', cursor: 'pointer'}}
+          >
+            重新加载
+          </button>
+        </div>
       ) : (
         <div className="contacts-container">
+          {/* 添加数据统计信息 */}
+          <div className="data-stats">
+            <span>共 {filteredContacts.length} 位联系人</span>
+            {searchTerm && <span>（搜索："{searchTerm}"）</span>}
+            {selectedDepartment !== '所有部门' && <span>（部门：{selectedDepartment}）</span>}
+          </div>
+          
           {Object.keys(groupedContacts).length === 0 ? (
-            <div className="no-results">未找到匹配的联系人</div>
+            <div className="no-results">
+              <div>😔 未找到匹配的联系人</div>
+              <div style={{fontSize: '14px', marginTop: '10px', opacity: 0.7}}>
+                请尝试调整搜索条件或选择其他部门
+              </div>
+            </div>
           ) : (
             departments.map(dept => (
               groupedContacts[dept] && (
@@ -198,7 +249,6 @@ function App() {
             <div className="contact-info">
               {selectedContact.手机 && (
                 <a href={`tel:${selectedContact.手机}`} className="contact-action">
-                  <div className="action-icon">📱</div>
                   <div className="action-label">手机</div>
                   <div className="action-value">{selectedContact.手机}</div>
                 </a>
@@ -206,7 +256,6 @@ function App() {
               
               {selectedContact.直线 && (
                 <a href={`tel:${selectedContact.直线}`} className="contact-action">
-                  <div className="action-icon">☎️</div>
                   <div className="action-label">直线</div>
                   <div className="action-value">{selectedContact.直线}</div>
                 </a>
@@ -214,7 +263,6 @@ function App() {
               
               {selectedContact.分机 && (
                 <div className="contact-action">
-                  <div className="action-icon">📞</div>
                   <div className="action-label">分机</div>
                   <div className="action-value">{selectedContact.分机}</div>
                 </div>
