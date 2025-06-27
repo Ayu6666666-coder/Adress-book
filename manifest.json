@@ -1,0 +1,15 @@
+{
+  "short_name": "办公通讯录",
+  "name": "上海新金桥能源科技有限公司办公通讯录",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#4285f4",
+  "background_color": "#ffffff"
+} 
